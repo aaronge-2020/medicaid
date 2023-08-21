@@ -54,7 +54,8 @@ import {
     getMedData,
     getNadacInfo,
     plotNadacNdc,
-    plotNadacMed
+    plotNadacMed,
+    getMedPlotDataFromNdcList
 } from "./sdk/plot/nadac.js"
 
 import {
@@ -102,7 +103,9 @@ import {
 
 
 import {
-    obtainMortalityData
+    obtainMortalityData,
+    plotMortalityTimeSeries,
+    plotMortalityTimeSeriesWithPrices,
 } from "./sdk/mortality.js";
 
 export {
@@ -187,7 +190,11 @@ export {
     getDrugContext,
 
     // mortality
-    obtainMortalityData
+    obtainMortalityData,
+    getMedPlotDataFromNdcList,
+    plotMortalityTimeSeries,
+    plotMortalityTimeSeriesWithPrices,
+    
 }
 
 //initialize localforage

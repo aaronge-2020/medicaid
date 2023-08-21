@@ -75,6 +75,26 @@ async function updateCache() {
     }
     updateCount = 0;
 }
+async function fetchData(url) {
+    // Check if the data is in the cache
+    const cachedData = await localforage.getItem(url);
+    if (cachedData) {
+      console.log('Data found in cache:', cachedData);
+      return cachedData;
+    }
+  
+    // If not found in cache, fetch data from the API
+    console.log(`Fetching data from ${url}`);
+    const response = await fetch(url);
+    const data = await response.json();
+  
+    // Store the response with localforage
+    await localforage.setItem(url, data);
+    console.log(`Data fetched and stored in cache for ${url}`);
+  
+    return data;
+  }
+
 
 function clearCache(){
     endpointStore.clear();
@@ -83,6 +103,8 @@ function clearCache(){
 export{
     getItems,
     postItem,
+    fetchData,
     clearCache,
-    endpointStore
+    endpointStore,
+    localforage
 }

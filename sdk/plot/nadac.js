@@ -84,7 +84,8 @@ async function getMedPlotDataFromNdcList(ndcs){
         return;
     }
     const medList = Array.isArray(ndcs) ? ndcs : [ndcs];
-    const data = await Promise.all(medList.map(med => getMedPlotData(med, "ndc")))
+    let data = await Promise.all(medList.map(med => getMedPlotData(med, "ndc")));
+    data.map(row => row.y = row.y.map(val => parseFloat(val)));
     return data;
 }
 
@@ -131,5 +132,5 @@ export {
     plotNadacNdc,
     plotNadacMed,
     // data retrieval
-    getMedPlotData,
+    getMedPlotDataFromNdcList,
 }
