@@ -99,10 +99,10 @@ function plotMortalityTimeSeriesWithPrices(divID, data, startDate, endDate, caus
 
 
   var layout = {
-    xaxis: {title: 'Date'},
+    xaxis: {title: 'Date for mortality data'},
     yaxis: {title: 'Number of Deaths'},
     xaxis2: {
-      title: 'Date',
+      title: 'Date for drug prices',
       overlaying: 'x', // Overlaying primary X-axis
       side: 'top'     // Positioning on the top
     },
