@@ -78,6 +78,16 @@ async function plotNadacNdc(ndcs, layout, div, axis) {
     const data = await Promise.all(medList.map(med => getMedPlotData(med, "ndc", axis)))
     return plot(data, layout, "line", div);
 }
+
+async function getMedPlotDataFromNdcList(ndcs){
+    if (ndcs === undefined){
+        return;
+    }
+    const medList = Array.isArray(ndcs) ? ndcs : [ndcs];
+    const data = await Promise.all(medList.map(med => getMedPlotData(med, "ndc")))
+    return data;
+}
+
 async function plotNadacMed(meds, layout, div, axis){
     if (meds === undefined){
         return;
@@ -119,5 +129,7 @@ export {
     getMedData,
     //plotting
     plotNadacNdc,
-    plotNadacMed
+    plotNadacMed,
+    // data retrieval
+    getMedPlotData,
 }

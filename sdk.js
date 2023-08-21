@@ -100,6 +100,11 @@ import {
     getDrugContext
 } from "./sdk/fda.js";
 
+
+import {
+    obtainMortalityData
+} from "./sdk/mortality.js";
+
 export {
     endpointStore,
     getItems,
@@ -179,7 +184,10 @@ export {
     getNdcsFromDisease,
     getRxcuiProperties,
     //fda
-    getDrugContext
+    getDrugContext,
+
+    // mortality
+    obtainMortalityData
 }
 
 //initialize localforage
