@@ -84,6 +84,7 @@ function plotMortalityTimeSeriesWithPrices(divID, data, startDate, endDate, caus
       y: filteredData.map((row) => row[cause]),
       type: "scatter",
       mode: "markers",
+      xaxis: 'x1',
       name: cause,
     };
   });
@@ -92,7 +93,7 @@ function plotMortalityTimeSeriesWithPrices(divID, data, startDate, endDate, caus
   drugPrices.forEach((drug) => {
     drug.type = "scatter";
     drug.mode = "markers";
-    drug.x = mortalityData[0].x; // Use the same x-axis as mortalityData
+    drug.xaxis = 'x1'; // Use the same x-axis as mortalityData
     drug.yaxis = 'y2'; // Use the secondary Y-axis
   });
 
