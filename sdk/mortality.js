@@ -70,7 +70,6 @@ async function obtainMortalityData() {
 
   return mergedData;
 }
-// Define the function to plot the time series
 function plotMortalityTimeSeriesWithPrices(divID, data, startDate, endDate, causes, jurisdiction, drugPrices) {
   // Filter the data by date range
   const filteredData = data.filter(
@@ -89,23 +88,17 @@ function plotMortalityTimeSeriesWithPrices(divID, data, startDate, endDate, caus
     };
   });
 
-  drugPrices.map((drug)=>{
+  // Prepare the drugPrices data using the same x-axis as mortalityData
+  drugPrices.forEach((drug) => {
     drug.type = "scatter";
     drug.mode = "markers";
-    drug.xaxis = 'x2', // Secondary X-axis
-    drug.yaxis = 'y2'  // Secondary Y-axis
-    drug.x.map((date)=>{ return new Date(date)})
-  })
-
+    drug.x = mortalityData[0].x; // Use the same x-axis as mortalityData
+    drug.yaxis = 'y2'; // Use the secondary Y-axis
+  });
 
   var layout = {
-    xaxis: {title: 'Date for mortality data'},
+    xaxis: {title: 'Date'},
     yaxis: {title: 'Number of Deaths'},
-    xaxis2: {
-      title: 'Date for drug prices',
-      overlaying: 'x', // Overlaying primary X-axis
-      side: 'top'     // Positioning on the top
-    },
     yaxis2: {
       title: 'Drug Price per Unit',
       overlaying: 'y', // Overlaying primary Y-axis
@@ -113,9 +106,10 @@ function plotMortalityTimeSeriesWithPrices(divID, data, startDate, endDate, caus
     },
     showlegend: true,
   };
+
   // Plot the graph
-  Plotly.newPlot(divID, [mortalityData[0], drugPrices[0]], layout);
-  return [mortalityData, drugPrices[0]];
+  Plotly.newPlot(divID, [...mortalityData, ...drugPrices], layout);
+  return [mortalityData, drugPrices];
 }
 
 // Define the function to plot the time series
