@@ -1,3 +1,2 @@
 sdk = await import ("http://127.0.0.1:5500/sdk.js");
-sdk.obtainPatentDataFromApplicationNumber("314077")
-sdk.obtainPatentDataFromNDC("314077")
+dat = await sdk.obtainPatentDataFromNDC("00591040801")
