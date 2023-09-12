@@ -108,6 +108,12 @@ import {
     plotMortalityTimeSeriesWithPrices,
 } from "./sdk/mortality.js";
 
+import {
+    obtainPatentDataFromApplicationNumber,
+    obtainPatentDataFromNDC,
+} from "./sdk/patent.js";
+
+
 export {
     endpointStore,
     getItems,
@@ -194,6 +200,10 @@ export {
     getMedPlotDataFromNdcList,
     plotMortalityTimeSeries,
     plotMortalityTimeSeriesWithPrices,
+
+    // patent
+    obtainPatentDataFromApplicationNumber,
+    obtainPatentDataFromNDC
     
 }
 
