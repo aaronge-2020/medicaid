@@ -100,7 +100,7 @@ async function obtainPatentDataFromNDC(NDC) {
 
   const drugContext = await getDrugContext(Rxcui)
 
-  const number = parseInt(drugContext.application_number)
+  const number = drugContext.application_number.replace(/\D/g, '')
 
 
   //   Filter the data to only include the patent, products, and exclusivity data for the given application number
