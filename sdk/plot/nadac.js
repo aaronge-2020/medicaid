@@ -126,6 +126,13 @@ async function getMedPlotDataFromNdcList(ndcs) {
     medList.map((med) => getMedPlotData(med, "ndc"))
   );
   data.map((row) => (row.y = row.y.map((val) => parseFloat(val))));
+
+  // Change the name of the data to the name from the NDC
+  data = await Promise.all(data.map(async (row) => {
+    row.name = await getNameFromNDC(row.name);
+    return row;
+  }));
+
   return data;
 }
 
@@ -184,5 +191,5 @@ export {
   plotNadacMed,
   // data retrieval
   getMedPlotDataFromNdcList,
-  getNameFromNDC
+  getNameFromNDC,
 };

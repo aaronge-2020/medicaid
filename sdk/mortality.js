@@ -106,6 +106,7 @@ function plotMortalityTimeSeriesWithPrices(divID, data, startDate, endDate, caus
       side: 'right'   // Positioning on the right
     },
     showlegend: true,
+    title: "Time Series of Deaths and Drug Prices",
   };
 
   // Plot the graph
