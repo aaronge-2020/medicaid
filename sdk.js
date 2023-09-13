@@ -54,7 +54,8 @@ import {
     getNadacInfo,
     plotNadacNdc,
     plotNadacMed,
-    getMedPlotDataFromNdcList
+    getMedPlotDataFromNdcList,
+    getNameFromNDC
 } from "./sdk/plot/nadac.js"
 
 import {
@@ -163,6 +164,7 @@ export {
     plotNadacNdc,
     plotNadacMed,
     getMedData,
+    getNameFromNDC,
     //healthcare quality
     getQualityMeasures,
     getRateDefinitions,
