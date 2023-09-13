@@ -8,6 +8,7 @@ async function getSchemas(){
     }
     return response;
 }
+
 const schemas = Object.keys(await getSchemas());
 //ENDPOINT: "metastore/schemas/{schemaType}
 async function getSpecificSchema(schemaName){
@@ -22,11 +23,11 @@ async function getSpecificSchema(schemaName){
 }
 
 //ENDPOINT: "metastore/schemas/{schema}/items"
-async function getSchemaItems(schemaName){
+async function getSchemaItems(schemaName, cacheFlag = false){
     if (schemaName === undefined || !schemas.includes(schemaName.toLowerCase())){
         throw new Error ("Please enter a valid schema.");
     }
-    let schemaItems = await getItems(`metastore/schemas/${schemaName.toLowerCase()}/items`);
+    let schemaItems = await getItems(`metastore/schemas/${schemaName.toLowerCase()}/items`, {blobFlag: false, cacheFlag: cacheFlag, baseUrl: 'https://data.medicaid.gov/api/1/'});
     if (schemaItems === undefined){
         throw new Error("Failed to retrieve schema items from the API.");
     }
@@ -45,8 +46,8 @@ function parseDatasetUrl(dataset){
     return (dataset["distribution"][0])["downloadURL"];
 }
 
-async function filterSchemaItems(schemaName, filterFn){
-    const items = await getSchemaItems(schemaName);
+async function filterSchemaItems(schemaName, filterFn, cacheFlag){
+    const items = await getSchemaItems(schemaName, cacheFlag);
     const filteredItems = items.filter(filterFn);
     const result = filteredItems.length === 1 ? filteredItems[0] : filteredItems;
     if (result === undefined){
@@ -54,48 +55,48 @@ async function filterSchemaItems(schemaName, filterFn){
     }
     return result;
 }
-async function getDatasetByTitleName(datasetTitle) {
-    return await filterSchemaItems("dataset", item => item.title.toUpperCase() === datasetTitle.toUpperCase());
+async function getDatasetByTitleName(datasetTitle, cacheFlag) {
+    return await filterSchemaItems("dataset", item => item.title.toUpperCase() === datasetTitle.toUpperCase(), cacheFlag);
 }
 
-async function getDatasetByKeyword(datasetKeyword){
-    return await filterSchemaItems("dataset", item => item["keyword"].some(key => key.toUpperCase() === datasetKeyword.toUpperCase()));
+async function getDatasetByKeyword(datasetKeyword, cacheFlag){
+    return await filterSchemaItems("dataset", item => item["keyword"].some(key => key.toUpperCase() === datasetKeyword.toUpperCase()), cacheFlag);
 }
 
-async function getDatasetByDescription(datasetDescription) {
-    return await filterSchemaItems("dataset", item => item.description.toUpperCase() === datasetDescription.toUpperCase());
+async function getDatasetByDescription(datasetDescription, cacheFlag) {
+    return await filterSchemaItems("dataset", item => item.description.toUpperCase() === datasetDescription.toUpperCase(), cacheFlag);
 }
 
-async function getDatasetByDownloadUrl(url){
-    return await filterSchemaItems("dataset", item => parseDatasetUrl(item) === url);
+async function getDatasetByDownloadUrl(url, cacheFlag){
+    return await filterSchemaItems("dataset", item => parseDatasetUrl(item) === url, cacheFlag);
 }
 
-async function getDistributionByDownloadUrl(url){
-    return await filterSchemaItems("distribution", item => item.data["downloadURL"] === url);
+async function getDistributionByDownloadUrl(url, cacheFlag){
+    return await filterSchemaItems("distribution", item => item.data["downloadURL"] === url, cacheFlag);
 }
 
 //endpoint: metastore/schemas/{schema}/items/{identifier}
-async function getSchemaItemById(schemaName, itemId){
-    const response = await getItems(`metastore/schemas/${schemaName.toLowerCase()}/items/${itemId}`);
+async function getSchemaItemById(schemaName, itemId, cacheFlag){
+    const response = await getItems(`metastore/schemas/${schemaName.toLowerCase()}/items/${itemId}`, {blobFlag: false, cacheFlag: cacheFlag, baseUrl: 'https://data.medicaid.gov/api/1/'});
     if (response === undefined){
         throw new Error ("The item could not be retrieved by its ID.");
     }
     return response;
 }
 
-async function getDatasetById(datasetId){
-    return await getSchemaItemById("dataset", datasetId);
+async function getDatasetById(datasetId, cacheFlag = false){
+    return await getSchemaItemById("dataset", datasetId, cacheFlag);
 }
 
-async function getDistributionById(distributionId){
-    return await getSchemaItemById("distribution", distributionId);
+async function getDistributionById(distributionId, cacheFlag = false){
+    return await getSchemaItemById("distribution", distributionId, cacheFlag);
 }
 
 async function convertDatasetToDistributionId(datasetId) {
     let dataset = await getDatasetById(datasetId);
     let downloadLink = parseDatasetUrl(dataset);
     let distribution = await getDistributionByDownloadUrl(downloadLink);
-    if (distribution === undefined) throw new Error("The dataset Id could not be converted.");
+    if (distribution === undefined || distribution === []) throw new Error("The dataset Id could not be converted.");
     let adjustedDistribution = Array.isArray(distribution) ? distribution : [distribution];
     return (adjustedDistribution)[0].identifier;
 }
@@ -104,7 +105,7 @@ async function convertDistributionToDatasetId(distributionId){
     let distribution = await getDistributionById(distributionId);
     let downloadLink = distribution.data["downloadURL"]
     let dataset = await getDatasetByDownloadUrl(downloadLink);
-    if (dataset === undefined) throw new Error("The distribution Id could not be converted");
+    if (dataset === undefined || dataset === []) throw new Error("The distribution Id could not be converted");
     let adjustedDataset = Array.isArray(dataset) ? dataset : [dataset];
     return (adjustedDataset)[0].identifier;
 }

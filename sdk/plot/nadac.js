@@ -1,6 +1,6 @@
 import {getDatasetByKeyword, convertDatasetToDistributionId} from "../metastore.js";
 import {getDatastoreQuerySql} from "../sql.js";
-import {getAllData, plot, plotifyData} from "./plot.js";
+import {getAllData, plot, plotifyData, convertDate} from "./plot.js";
 import {endpointStore} from "../httpMethods.js";
 import {getDatastoreImport} from "../datastore.js";
 
@@ -53,9 +53,9 @@ async function getMedNames(medicine){
 }
 
 async function getMedData(items, filter = "ndc", dataVariables = ["as_of_date", "nadac_per_unit"]){
-    if (ndcs === undefined) ndcs = await getNadacNdcs();
     if (items === undefined) throw new Error("Please provide valid items.");
     if (filter === "ndc"){
+        if (ndcs === undefined) ndcs = await getNadacNdcs();
         items.forEach(item => {if (!ndcs.has(item)) throw new Error("This NDC is not contained within the Medicaid Dataset.");})
     }
     await updateNadac();
@@ -66,6 +66,7 @@ async function getMedData(items, filter = "ndc", dataVariables = ["as_of_date", 
 async function getMedPlotData(meds, filter, axis = {xAxis: "as_of_date", yAxis: "nadac_per_unit"}){
     const medList = Array.isArray(meds) ? meds : [meds];
     const medData = await getMedData(medList, filter, Object.values(axis));
+    medData.sort((a,b) => convertDate(a[axis.xAxis]) - convertDate(b[axis.xAxis]))
     const plotData = plotifyData(medData, axis);
     return {x: plotData[axis.xAxis], y: plotData[axis.yAxis], name: medList[0]}
 }
@@ -103,11 +104,10 @@ async function getNadacInfo(){
 }
 
 async function preImport(){
-    let datasets = (await getDatasetByKeyword("nadac")).filter(r => r.title.includes("(National Average Drug Acquisition Cost)"))
+    let datasets = (await getDatasetByKeyword("nadac", false)).filter(r => r.title.includes("(National Average Drug Acquisition Cost)"))
     datasets = datasets.sort((a, b) => a.title.localeCompare(b.title))
     distributions = await Promise.all(datasets.map(r => {return convertDatasetToDistributionId(r.identifier)}));
     await endpointStore.removeItem(`metastore/schemas/dataset/items/${datasets[datasets.length - 1].identifier}`)
-    await endpointStore.removeItem("metastore/schemas/distribution/items");
 }
 
 async function updateNadac() {
