@@ -5,10 +5,10 @@ import { getDrugContext } from "./fda.js";
 
 
 const URLS = {
-  patent: "http://127.0.0.1:5501/FDA_patent_data/patent.txt",
-  exclusivity: "http://127.0.0.1:5501/FDA_patent_data/exclusivity.txt",
-  products: "http://127.0.0.1:5501/FDA_patent_data/products.txt",
-  purple_book: "http://127.0.0.1:5501/FDA_patent_data/FDA_purplebook.json",
+  patent: "https://aaronge-2020.github.io/medicaid/FDA_patent_data/patent.txt",
+  exclusivity: "https://aaronge-2020.github.io/medicaid/medicaid/FDA_patent_data/exclusivity.txt",
+  products: "https://aaronge-2020.github.io/medicaid/FDA_patent_data/products.txt",
+  purple_book: "https://aaronge-2020.github.io/medicaid/FDA_patent_data/FDA_purplebook.json",
 
 };
 
