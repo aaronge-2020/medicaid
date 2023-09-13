@@ -1,13 +1,15 @@
-import { fetchData, localforage } from "./httpMethods.js";
+import { localforage } from "./httpMethods.js";
 import Plotly from "https://cdn.jsdelivr.net/npm/plotly.js-dist/+esm";
 import {getRxcuiFromNdc} from "./rxNorm.js";
 import { getDrugContext } from "./fda.js";
 
 
 const URLS = {
-  patent: "http://127.0.0.1:5500/orange_book/patent.txt",
-  exclusivity: "http://127.0.0.1:5500/orange_book/exclusivity.txt",
-  products: "http://127.0.0.1:5500/orange_book/products.txt",
+  patent: "http://127.0.0.1:5501/FDA_patent_data/patent.txt",
+  exclusivity: "http://127.0.0.1:5501/FDA_patent_data/exclusivity.txt",
+  products: "http://127.0.0.1:5501/FDA_patent_data/products.txt",
+  purple_book: "http://127.0.0.1:5501/FDA_patent_data/FDA_purplebook.json",
+
 };
 
 function parseFDAData(text) {
@@ -43,8 +45,11 @@ async function obtainOrangeBook() {
 
   let exclusivity = await localforage.getItem("exclusivity");
 
+  let purple_book = await localforage.getItem("purple_book");
+
+
   // If patent, products, or exclusivity are not in localforage, fetch them from the URLs and store them in localforage
-  if (!patent || !products || !exclusivity) {
+  if (!patent || !products || !exclusivity || !purple_book) {
     const unparsedPatent = await (await fetch(URLS["patent"])).text();
     const unparsedProducts = await (await fetch(URLS["products"])).text();
     const unparsedExclusivity = await (await fetch(URLS["exclusivity"])).text();
@@ -56,31 +61,39 @@ async function obtainOrangeBook() {
     localforage.setItem("patent", patent);
     localforage.setItem("products", products);
     localforage.setItem("exclusivity", exclusivity);
+
+    // Get the purple book data
+    purple_book = await (await fetch(URLS["purple_book"])).json();
+    
+    localforage.setItem("purple_book", purple_book);
   }
 
-  return [patent, products, exclusivity];
+  return [patent, products, exclusivity, purple_book];
 }
 
 async function obtainPatentDataFromApplicationNumber(number) {
-  let [patent, products, exclusivity] = await obtainOrangeBook();
+  let [patent, products, exclusivity, purple_book] = await obtainOrangeBook();
 
   //   Filter the data to only include the patent, products, and exclusivity data for the given application number
   const patentData = patent.filter((item) => item.Appl_No === number);
   const productsData = products.filter((item) => item.Appl_No === number);
   const exclusivityData = exclusivity.filter((item) => item.Appl_No === number);
+  const purpleBookData = purple_book.filter((item) => item.BLA_Number === number);
+
 
   //   Concatenate all the data into a single JSON object and return it
   const data = {
     patent: patentData,
     products: productsData,
     exclusivity: exclusivityData,
+    purple_book: purpleBookData,
   };
 
   return data;
 }
 
 async function obtainPatentDataFromNDC(NDC) {
-  let [patent, products, exclusivity] = await obtainOrangeBook();
+  let [patent, products, exclusivity, purple_book] = await obtainOrangeBook();
 
 
   const Rxcui = await getRxcuiFromNdc(NDC);
@@ -94,12 +107,14 @@ async function obtainPatentDataFromNDC(NDC) {
   const patentData = patent.filter((item) => item.Appl_No === number);
   const productsData = products.filter((item) => item.Appl_No === number);
   const exclusivityData = exclusivity.filter((item) => item.Appl_No === number);
+  const purpleBookData = purple_book.filter((item) => item.BLA_Number === number);
 
   //   Concatenate all the data into a single JSON object and return it
   const data = {
     patent: patentData,
     products: productsData,
     exclusivity: exclusivityData,
+    purple_book: purpleBookData,
   };
 
   return data;
